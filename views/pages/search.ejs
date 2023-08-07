@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Search - Lucas Nioi's Wonderful Website</title>
+  	<%- include ("../partials/header.ejs") %>
+</head>
+
+<body>
+  	<%- include ("../partials/nav.ejs") %>
+	
+	<br>
+	
+	<div class="content-main">
+		<form class="d-flex" action="/search" method="GET">
+			<input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" name="terms">
+			<button class="btn btn-warning" type="submit">Search</button>
+		</form>
+
+		<br>
+
+		<h4>Search results for "<%= search %>":</h4>
+		
+		<br>
+		
+		<hr>
+
+		<% results.forEach(function(result) { %>
+			<% if (typeof result != "string") { %>
+				<p><a href="<%= result.link %>"><%= result.title %></a></p>
+				<p><small><%= result.link %></small></p>
+			<% } else { %>
+				<p><%= result %></p>
+			<% } %>
+			<hr>
+		<% }); %>
+	</div>
+</body>
+</html>

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Games - Lucas Nioi's Wonderful Website</title>
+  	<%- include ("../partials/header.ejs") %>
+</head>
+
+<body>
+  	<%- include ("../partials/nav.ejs") %>
+	
+	<br>
+	
+    <div class="content-main">
+        <h4>Here is a list of our games:</h4>
+        
+        <br>
+        
+        <ul>
+            <% games.forEach(function(game) { %>
+                <li><a href="<%= game.link %>"><%= game.title %></a></li>
+            <% }); %>
+        </ul>
+    </div>
+</body>
+</html>

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Sims - Lucas Nioi's Wonderful Website</title>
+  	<%- include ("../partials/header.ejs") %>
+    <link rel="stylesheet" href="/stylesheets/sims.css">
+</head>
+
+<body>
+  	<%- include ("../partials/nav.ejs") %>
+	
+	<br>
+	
+    <div class="content-main">
+
+	<h4>Here is a list of our sims:</h4>
+	
+	<br>
+	
+    <ul>
+        <% sims.forEach(function(sim) {%>
+            <li><a href="<%= sim.link %>"><%= sim.title %></a></li>
+        <% }); %>
+    </ul>
+
+    </div>
+</body>
+</html>

@@ -1,0 +1,34 @@
+#EFieldCanvas {
+	border: 3px solid black;
+}
+
+#simTable {
+	border: 3px solid black;
+}
+
+#gostop {
+	text-align: center;
+}
+
+#pos-label {
+	color: #FF0000;
+}
+
+#neg-label {
+	color: #0000FF;
+}
+
+#info {
+	margin-right: 6em;
+	margin-left: 6em;
+}
+
+.center {
+	text-align: center;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.left {
+	text-align: left;
+}

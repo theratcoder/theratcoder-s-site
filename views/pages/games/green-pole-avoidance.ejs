@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Green Pole Avoidance Game</title>
+    <style>
+#restart-container {
+    position: absolute;
+}
+    </style>
+</head>
+
+<body>
+	
+	<br>
+
+    <button id="START" onclick="startGame(); this.style.display = 'none';">Start!</button>
+    <div id="restart-container">
+        <button id="RESTART" onclick="gameArea.restart()" style="display:none">Restart</button>
+    </div>
+
+    <p id="canvas-insert"></p>
+    <p id="highscore"></p>
+
+    <script type=text/javascript>
+const restartBtn = document.querySelector("#RESTART");
+const restartBtnContainer = document.querySelector("#restart-container");
+
+var highscore = localStorage.getItem("highscore");
+const highscoreDisplay = document.querySelector("#highscore");
+
+if (highscore !== null) {
+    highscoreDisplay.innerHTML = "Your highscore is " + localStorage.getItem("highscore");
+}
+else {
+    highscoreDisplay.innerHTML = "Play the game to set a highscore";
+    localStorage.setItem("highscore", 0);
+}
+
+var square;
+var poles = [];
+var score;
+var level = 0;
+
+function startGame() {
+    square = new component(30, 30, "red", 10, 120);
+    score = new component("30px", "Consolas", "black", 280, 40, "text");
+    gameArea.start();
+}
+
+function drawText(text, x, y, font, color, align, baseline) {
+    var finalText = text;
+
+    gameArea.context.textBaseline = baseline != undefined ? baseline : "alphabetic";
+    gameArea.context.textAlign = align != undefined ? align : "start";
+    gameArea.context.font = font;
+    gameArea.context.fillStyle = color;
+
+    var dims = gameArea.context.measureText(text);
+
+    if (dims.width > gameArea.canvas.width) {
+        finalText = "";
+        var tempText = text;
+        var maxCharsPerLine = Math.floor(tempText.length / (dims.width / gameArea.canvas.width));
+
+        while (tempText.length > maxCharsPerLine) {
+            if (tempText.slice(maxCharsPerLine - 1).includes(" ")) {
+                for (var i = maxCharsPerLine - 1; i >= 0; i--) {
+                    if (tempText[i] == " ") {
+                        finalText += tempText.slice(0, i) + "\n";
+                        tempText = tempText.slice(i);
+                        break;
+                    }
+                }
+            }
+            else {
+                finalText += tempText.slice(0, maxCharsPerLine - 1) + "\n";
+                tempText = tempText.slice(maxCharsPerLine - 1);
+            }
+        }
+        finalText += tempText;
+    }
+    
+    gameArea.context.fillText(finalText, x, y);
+    // reset some of the text properties to draw other things correctly
+    gameArea.context.textAlign = "start";
+    gameArea.context.textBaseLine = "alphabetic";
+}
+
+var gameArea = {
+    canvas : document.createElement("canvas"),
+    start() {
+        this.canvas.width = 480;
+        this.canvas.height = 270;
+        this.context = this.canvas.getContext("2d");
+        document.querySelector("#canvas-insert").parentNode.insertBefore(
+            this.canvas, document.querySelector("#canvas-insert")
+        );
+        this.frameNo = 0;
+
+        window.addEventListener('keydown', function (e) {
+            gameArea.keys = (gameArea.keys || []);
+            gameArea.keys[e.keyCode] = true;
+        })
+        window.addEventListener('keyup', function (e) {
+            gameArea.keys[e.keyCode] = false;
+        })
+
+        this.interval = setInterval(updateGameArea, 20);
+    },
+    clear() {
+        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    },
+    stop() {
+        clearInterval(this.interval);
+
+        this.context.globalAlpha = 0.5;
+        this.context.fillStyle = "grey";
+        this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        this.context.globalAlpha = 1;
+
+        document.getElementById("RESTART").style.display = "block";
+
+        var restartWidth = restartBtn.offsetWidth;
+        var restartHeight = restartBtn.offsetHeight;
+        
+        restartBtnContainer.style.paddingTop = 135 - (restartHeight / 2) + "px";
+        restartBtnContainer.style.paddingLeft = 240 - (restartWidth / 2) + "px";
+
+        if (highscore < gameArea.frameNo) {
+            var newhighscore = gameArea.frameNo
+            localStorage.setItem("highscore", newhighscore);
+            
+            drawText(`New high score set! (Up ${newhighscore - highscore} from ${highscore} to ${newhighscore})`,
+                240, 
+                145 + restartHeight,
+                "25px Consolas",
+                "purple",
+                "center",
+                "middle"
+            );
+            /*
+            this.context.textBaseline = "middle";
+            this.context.textAlign = "center";
+            this.context.font = "25px Consolas";
+            this.context.fillStyle = "purple";
+            this.context.fillText(`New high score set! (Up ${newhighscore - highscore} from ${highscore} to ${newhighscore})`, 240, 145 + restartHeight);
+            // reset some of the text properties to draw the score correctly
+            this.context.textAlign = "start";
+            this.context.textBaseLine = "alphabetic";
+            */
+
+            highscoreDisplay.innerHTML = `Your highscore is ${newhighscore}`;
+
+            highscore = newhighscore;
+        }
+    },
+    restart() {
+        poles = [];
+        square = new component(30, 30, "red", 10, 120);
+        score = new component("30px", "Consolas", "black", 280, 40, "text");
+
+        document.querySelector("#RESTART").style.display = "none";
+        
+        this.frameNo = 0;
+        level = 0;
+        this.interval = setInterval(updateGameArea, 20);
+    }
+}
+
+class component {
+    constructor(width, height, color, x, y, type) {
+        this.type = type;
+        this.width = width;
+        this.height = height;
+        this.speedX = 0;
+        this.speedY = 0;    
+        this.x = x;
+        this.y = y;
+        this.color = color;
+        this.illegalAllowed = this.type == "pole";
+    }
+
+    update() {
+        var ctx = gameArea.context;
+        if (this.type == "text") {
+            ctx.font = this.width + " " + this.height;
+            ctx.fillStyle = this.color;
+            ctx.fillText(this.text, this.x, this.y);
+        } else {
+            ctx.fillStyle = this.color;
+            ctx.fillRect(this.x, this.y, this.width, this.height);
+        }
+    }
+
+    move() {
+        if (this.illegalAllowed) {
+            this.x += this.speedX;
+            this.y += this.speedY;
+            return;
+        }
+        
+        if (
+            (this.x > 0 ||
+            this.speedX > 0) &&
+            (this.x < gameArea.canvas.width - this.width ||
+            this.speedX < 0)
+            )
+        {
+            this.x += this.speedX;
+        }
+        if (
+            (this.y > 0 ||
+            this.speedY > 0) &&
+            (this.y < gameArea.canvas.height - this.height ||
+            this.speedY < 0)
+            )
+        {
+            this.y += this.speedY;
+        }
+    }
+
+    hasCrashedWith(othercomp) {
+        var myleft = this.x;
+        var myright = this.x + (this.width);
+        var mytop = this.y;
+        var mybottom = this.y + (this.height);
+        var otherleft = othercomp.x;
+        var otherright = othercomp.x + (othercomp.width);
+        var othertop = othercomp.y;
+        var otherbottom = othercomp.y + (othercomp.height);
+        var crash = true;
+        if ((mybottom < othertop) || (mytop > otherbottom) || (myright < otherleft) || (myleft > otherright))
+            crash = false;
+        
+        return crash;
+    }
+}
+function restart() {
+    location.reload();
+}
+
+var testhighscore = true;
+
+function updateGameArea() {
+    var x, height, gap, minHeight, maxHeight, minGap, maxGap;
+    for (i = 0; i < poles.length; i += 1) {
+        if (square.hasCrashedWith(poles[i])) {
+            updatehighscore();
+            gameArea.stop();
+            return;
+        } 
+    }
+    
+    gameArea.clear();
+    gameArea.frameNo += 1;
+    if (gameArea.frameNo == 1 || everyinterval(150)) {
+        x = gameArea.canvas.width;
+        minHeight = 20;
+        maxHeight = 200;
+        height = Math.floor(Math.random() * (maxHeight - minHeight + 1) + minHeight);
+        minGap = 50;
+        maxGap = 200;
+        gap = Math.floor(Math.random() * (maxGap - minGap + 1) + minGap);
+        poles.push(new component(10, height, "green", x, 0, "pole"));
+        poles.push(new component(10, x - height - gap, "green", x, height + gap, "pole"));
+    }
+
+    if (everyinterval(5000) && level < 19) {
+        level++;
+
+        clearInterval(gameArea.interval);
+
+        var ctx = gameArea.context;
+
+        ctx.globalAlpha = 0.5;
+        ctx.fillStyle = "grey";
+        ctx.fillRect(0, 0, gameArea.canvas.width, gameArea.canvas.height);
+        ctx.globalAlpha = 1;
+
+        ctx.textBaseline = "middle";
+        ctx.textAlign = "center";
+        ctx.font = "25px Consolas";
+        ctx.fillStyle = "white";
+        ctx.fillText(`Level ${level + 1} reached!`, 240, 135);
+        // reset some of the text properties to draw the score correctly
+        ctx.textAlign = "start";
+        ctx.textBaseLine = "alphabetic";
+        
+        // this will display the alert for 2 seconds
+        setTimeout(() => {gameArea.interval = setInterval(updateGameArea, 20 - level)}, 2000);
+    }
+
+    /*
+    square.speedX = square.speedY = 0;
+
+    if (gameArea.keys && gameArea.keys[37]) square.speedX = -1;
+    if (gameArea.keys && gameArea.keys[39]) square.speedX = 1;
+    if (gameArea.keys && gameArea.keys[38]) square.speedY = -1;
+    if (gameArea.keys && gameArea.keys[40]) square.speedY = 1;
+    */
+
+    for (i = 0; i < poles.length; i += 1) {
+        poles[i].speedX = -1;
+        poles[i].move();
+        poles[i].update();
+    }
+
+    score.text = "SCORE: " + gameArea.frameNo;
+    score.update();
+    square.move();    
+    square.update();
+}
+
+function everyinterval(n) {
+    if ((gameArea.frameNo / n) % 1 == 0) { return true; }
+    return false;
+}
+
+function updatehighscore() {
+    if (testhighscore && localStorage.getItem("highscore") < square.frameNo) {
+        localStorage.setItem("highscore", square.frameNo);
+        document.write("Your highscore is now " +  localStorage.getItem("highscore"));
+    }
+}
+
+function moveup() {
+    square.speedY = -1; 
+}
+
+function movedown() {
+    square.speedY = 1; 
+}
+
+function moveleft() {
+    square.speedX = -1; 
+}
+
+function moveright() {
+    square.speedX = 1; 
+}
+
+function clearmove() {
+    square.speedX = 0; 
+    square.speedY = 0; 
+}
+    </script>
+    <div style="text-align:center;width:480px;">
+      <button onmousedown="moveup()" onmouseup="clearmove()" ontouchstart="moveup()">UP</button><br><br>
+      <button onmousedown="moveleft()" onmouseup="clearmove()" ontouchstart="moveleft()">LEFT</button>
+      <button onmousedown="moveright()" onmouseup="clearmove()" ontouchstart="moveright()">RIGHT</button><br><br>
+      <button onmousedown="movedown()" onmouseup="clearmove()" ontouchstart="movedown()">DOWN</button>
+    </div>
+    
+    <p>The score will count one point for each frame you manage to "stay alive". Try and beat my high score (3500)!</p>
+    <p>
+        <small>
+            Thanks to those at <a href="https://www.w3schools.com">W3Schools.com</a> for the <a href="https://www.w3schools.com/graphics/game_intro.asp">tutorial</a> I followed to make this game.
+            I have also made my own alterations to their orginal code, but the idea and base game come from them.
+        </small>
+    </p>
+</body>
+</html>

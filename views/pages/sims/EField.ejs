@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Electric Field Sim</title>
+		<link rel="stylesheet" href="/stylesheets/sims/EField.css">
+		<script src="/scripts/sims/EField/draw.js"></script>
+		<script src="/scripts/sims/EField/EFieldCanvas.js"></script>
+		<script src="/scripts/sims/EField/EField.js"></script>
+	</head>
+	<body>
+		<div class="center">
+			<table id="simTable" cellspacing="5px" cellpadding="0" class="center"><tbody>
+						<tr>
+								<td>
+									<canvas id="EFieldCanvas" width="652" height="400"></canvas>
+								</td>
+								<div class="left">
+									<td>
+									<label for="charge">
+										Charge:
+									</label>
+									<input type="range" name="charge" id="charge" min="-9" max="9">
+								</div>
+									<br>
+									<br>
+									<div id="gostop">
+										<button id="go">Go</button>
+										<button id="stop">Stop</button>
+										<br>
+										<br>
+										<button id="reset">Reset</button>
+										<button id="refresh">Refresh</button>
+										<br><br>
+										<button id="randomize">Randomize</button>
+									</div>
+									<br>
+									<div class="left">
+									<input type="checkbox" name="gradientCharges" id="gradientCharges" checked="true"> <label for="gradientCharges">Gradient Charges</label>
+									<br>
+									<input type="checkbox" name="eqPotentialLines" id="eqPotentialLines" checked="true">
+									<label for="eqPotentialLines">Equipotential Lines</label>
+									<br>
+									<input type="checkbox" name="fieldLines" id="fieldLines" checked="true">
+									<label for="fieldLines">Field Lines</label>
+									<br>
+									<label for="numFieldLines">Field Lines Per Charge:</label>
+									<br>
+									<input type="number" name="numFieldLines" id="numFieldLines" value="5">
+									<br>
+									<br>
+									<input type="checkbox" checked="true" name="initVelocity" id="initVelocity">
+									<label for="initVelocity">Initial Velocity</label>
+									<br>
+									<input type="checkbox" name="wallBoundary" id="wallBoundary">
+									<label for="wallBoundary">Wall Boundary</label>
+									<br>
+									<p>System Charge: <span id="sysChargeDisp">0</span></p>
+								</div>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				
+				<div id="info">	
+					<br><br>
+
+						<div class="center">
+							<b>Welcome to the Electric Field Sim</b><br>
+						</div>
+This simulator allows the user to set up a distribution of charges, upon which the sim will show the electric potential, electric field lines, and equipotential lines. In addition, the electric force will be observed through real time interaction of charges. 
+
+	<br><br>
+
+	<div class="center">
+		<p>
+			<span id="neg-label">BLUE = Negative Charge</span>
+			&nbsp;&nbsp;&nbsp;&nbsp;
+			<span id="pos-label">RED = Positive Charge</span>
+		</p>
+	</div>
+
+	<br>
+	<div class="center"><b>Electric Field and Potential:</b></div>
+	<li>Set the charge by adjusting the range slider on the right.</li>
+	<li>Click anywhere on the simulator to put a charge down.</li>
+	<li>Continue putting various charges.</li>
+	<li>Afterward, it will show each feature selected with the check boxes one by one.</li>
+
+	<br><br>
+
+	<div class="center"><b>Electric Force:</b></div>
+	<li>The "Go" button will let the charges
+accelerate according to the electric charge.</li>
+	<li>The "Stop" button will stop the charges moving.</li>
+	<li>The "Randomize" button will add 5 randow charges.</li>
+	<li>Initial Velocity: Each charge is assigned a random initial velocity (between -5 and 5 pixels)</li>
+	<li>Wall Boundary: The charges will be confined to the area of the sim, and any charge that hits the sides will &quot;bounce&quot; off. If this option is disabled, the charges that leave the area will be deleted.</li>
+
+	<br><br>
+	<b>*</b>This simulator shows the field lines, potential, equipotential lines, and electric force
+only as a representation and as an approximation.
+
+<br><br>
+
+Questions or comments?  Send a request to <a href="https://calm-hamlet-80058.herokuapp.com/support">lucasnioi.ddns.net/support</a>
+<br>
+<p>
+	Download this simulator <a href="/downloads/EFieldSim.zip" download>here</a>.
+</p>
+		</div>
+	</body>
+</html>

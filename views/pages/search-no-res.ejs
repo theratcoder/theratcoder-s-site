@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+ <!--This page will show if nothing has been searched for yet-->
+ <html lang="en">
+     <head>
+         <title>Search - Lucas Nioi's Wonderful Website</title>
+         <%- include ("../partials/header.ejs") %>
+     </head>
+     <body>
+        <%- include ("../partials/nav.ejs") %>
+
+        <br>
+
+        <div class="content-main">
+            <form class="d-flex" action="/search" method="GET">
+                <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" name="terms">
+                <button class="btn btn-warning" type="submit">Search</button>
+            </form>
+        </div>
+     </body>
+ </html>

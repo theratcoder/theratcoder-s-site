@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>Support - Lucas Nioi's Wonderful Website</title>
+		<%- include ("../partials/header.ejs") %>
+	</head>
+
+	<%- include ("../partials/nav.ejs") %>
+	<div class="p-5">
+	<form action="/support" method="POST">
+		<label>Send us a support request:</label>
+		<br>
+		<label for="name" class="form-label">Name:</label>
+		<input type="text" name="name" class="form-control">
+		<br>
+		<label for="email" class="form-label">Email:</label>
+		<input type="email" name="email" class="form-control">
+		<br>
+		<label for="message">Enter a message:</label>
+		<br>
+		<textarea name="message" class="form-control" rows="3">
+		</textarea>
+		<br>
+		<input type="submit" class="btn btn-primary">
+	</div>
+	</form>
+</html>
